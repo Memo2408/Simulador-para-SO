@@ -9,4 +9,13 @@ public:
     std::vector<std::string> eventos() override;
     std::string imprimir() override;
 private:
+    struct Bloque {
+        int inicio;
+        int tamano;
+        Proceso* proceso;
+    };
+
+    int memoriaKB;
+    std::vector<Bloque> bloques;
+    std::vector<std::string> avisos;
 };
