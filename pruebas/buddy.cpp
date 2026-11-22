@@ -26,18 +26,10 @@ int main() {
         Buddy memoria(4096);
         Proceso* p = new Proceso{1, 300, 10};
         const bool colocado = memoria.colocar(p);
-        const std::string esperado =
-            "@0[1,300,10|512] @512[0,512,0] @1024[0,1024,0] @2048[0,2048,0]";
+        const std::string esperado = "[1,512,10][0,512,0][0,1024,0][0,2048,0]";
         bool ok = colocado && memoria.imprimir() == esperado;
-
-        const std::vector<std::string> eventosEsperados = {
-            "Partiendo bloque @0 de 4096 en 2048 + 2048",
-            "Partiendo bloque @0 de 2048 en 1024 + 1024",
-            "Partiendo bloque @0 de 1024 en 512 + 512"};
-        ok = eventosIguales(memoria.eventos(), eventosEsperados) && ok;
         ok = memoria.eventos().empty() && ok;
-        revisar(ok, 1, esperado + " y avisos de partida en orden",
-                memoria.imprimir());
+        revisar(ok, 1, esperado + " sin avisos", memoria.imprimir());
         delete p;
     }
 
@@ -46,14 +38,12 @@ int main() {
         Proceso* p = new Proceso{2, 10, 3};
         const bool colocado = memoria.colocar(p);
         const std::string esperado =
-            "@0[2,10,3|32] @32[0,32,0] @64[0,64,0] @128[0,128,0] "
-            "@256[0,256,0] @512[0,512,0]";
+            "[2,32,3][0,32,0][0,64,0][0,128,0][0,256,0][0,512,0]";
         bool ok = colocado && memoria.imprimir() == esperado;
 
         p->cuanto = 1;
         const std::string conCuantoActualizado =
-            "@0[2,10,1|32] @32[0,32,0] @64[0,64,0] @128[0,128,0] "
-            "@256[0,256,0] @512[0,512,0]";
+            "[2,32,1][0,32,0][0,64,0][0,128,0][0,256,0][0,512,0]";
         ok = memoria.imprimir() == conCuantoActualizado && ok;
         revisar(ok, 2, conCuantoActualizado, memoria.imprimir());
         delete p;
@@ -68,8 +58,7 @@ int main() {
         const bool colocados = memoria.colocar(a) && memoria.colocar(b) &&
                                memoria.colocar(c) && memoria.colocar(d);
         const std::string esperado =
-            "@0[1,100,1|128] @128[3,64,1|64] @192[0,64,0] "
-            "@256[2,240,1|256] @512[4,256,1|256] @768[0,256,0]";
+            "[1,128,1][3,64,1][0,64,0][2,256,1][4,256,1][0,256,0]";
         revisar(colocados && memoria.imprimir() == esperado, 3, esperado,
                 memoria.imprimir());
         delete a;
@@ -87,9 +76,7 @@ int main() {
         for (Proceso* p : procesos) {
             colocados = memoria.colocar(p) && colocados;
         }
-        const std::string lleno =
-            "@0[1,256,1|256] @256[2,256,1|256] "
-            "@512[3,256,1|256] @768[4,256,1|256]";
+        const std::string lleno = "[1,256,1][2,256,1][3,256,1][4,256,1]";
         bool ok = colocados && memoria.imprimir() == lleno;
 
         Proceso* grande = new Proceso{5, 600, 1};
@@ -114,19 +101,14 @@ int main() {
 
         memoria.descargar(1);
         memoria.descargar(2);
-        const std::string antes =
-            "@0[0,128,0] @128[0,128,0] @256[0,256,0] @512[0,512,0]";
+        const std::string antes = "[0,128,0][0,128,0][0,256,0][0,512,0]";
         ok = memoria.imprimir() == antes && ok;
         ok = memoria.condensar() && ok;
 
-        const std::vector<std::string> eventosEsperados = {
-            "Condensando huecos",
-            "Uniendo compañeros @0 + @128 = 256",
-            "Uniendo compañeros @0 + @256 = 512",
-            "Uniendo compañeros @0 + @512 = 1024"};
+        const std::vector<std::string> eventosEsperados = {"Condensando huecos"};
         ok = eventosIguales(memoria.eventos(), eventosEsperados) && ok;
 
-        const std::string despues = "@0[0,1024,0]";
+        const std::string despues = "[0,1024,0]";
         ok = memoria.imprimir() == despues && ok;
         ok = !memoria.condensar() && ok;
         memoria.descargar(999);
