@@ -50,11 +50,6 @@ bool Buddy::colocar(Proceso* p) {
         }
 
         const int mitad = bloque.tamano / 2;
-        std::ostringstream aviso;
-        aviso << "Partiendo bloque @" << bloque.inicio << " de "
-              << bloque.tamano << " en " << mitad << " + " << mitad;
-        avisos.push_back(aviso.str());
-
         const Bloque derecha{bloque.inicio + mitad, mitad, nullptr};
         bloques[candidato].tamano = mitad;
         bloques.insert(bloques.begin() + candidato + 1, derecha);
@@ -91,10 +86,6 @@ bool Buddy::condensar() {
                 avisos.push_back("Condensando huecos");
                 avisoInicioAgregado = true;
             }
-            std::ostringstream aviso;
-            aviso << "Uniendo compañeros @" << izquierda.inicio << " + @"
-                  << derecha.inicio << " = " << izquierda.tamano * 2;
-            avisos.push_back(aviso.str());
 
             bloques[i].tamano *= 2;
             bloques.erase(bloques.begin() + i + 1);
@@ -114,18 +105,12 @@ std::vector<std::string> Buddy::eventos() {
 
 std::string Buddy::imprimir() {
     std::ostringstream salida;
-    for (std::size_t i = 0; i < bloques.size(); ++i) {
-        if (i > 0) {
-            salida << ' ';
-        }
-
-        const Bloque& bloque = bloques[i];
-        salida << '@' << bloque.inicio << '[';
+    for (const Bloque& bloque : bloques) {
         if (bloque.proceso == nullptr) {
-            salida << "0," << bloque.tamano << ",0]";
+            salida << "[0," << bloque.tamano << ",0]";
         } else {
-            salida << bloque.proceso->id << ',' << bloque.proceso->tamano << ','
-                   << bloque.proceso->cuanto << '|' << bloque.tamano << ']';
+            salida << '[' << bloque.proceso->id << ',' << bloque.tamano << ','
+                   << bloque.proceso->cuanto << ']';
         }
     }
     return salida.str();
