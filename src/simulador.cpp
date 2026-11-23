@@ -1,4 +1,4 @@
-﻿#include "simulador.h"
+#include "simulador.h"
 
 #include <algorithm>
 #include <iostream>
@@ -33,9 +33,6 @@ void Simulador::ciclo() {
             std::cout << memoria.imprimir() << '\n';
             lista.push_back(listo);
             listo = nullptr;
-        } else {
-            std::cout << "Proceso [" << listo->id << ',' << listo->tamano << ','
-                      << listo->cuanto << "] en espera: no cabe\n";
         }
     }
 
@@ -80,8 +77,11 @@ void Simulador::ciclo() {
     std::cout << '\n';
 }
 
+void Simulador::ponerPausa(int milisegundos) {
+    pausa = milisegundos;
+}
+
 void Simulador::correr() {
-    const int pausa = 500;
     std::cout << memoria.imprimir() << "\n\n";
 
     while (true) {
@@ -94,6 +94,10 @@ void Simulador::correr() {
                 _getch();
             } else if (tecla == 's' || tecla == 'S') {
                 break;
+            } else if (tecla == '+' && pausa > 100) {
+                pausa -= 100;
+            } else if (tecla == '-' && pausa < 2000) {
+                pausa += 100;
             }
         }
 #else
