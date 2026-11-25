@@ -26,7 +26,7 @@ int main() {
         Buddy memoria(4096);
         Proceso* p = new Proceso{1, 300, 10};
         const bool colocado = memoria.colocar(p);
-        const std::string esperado = "[1,512,10][0,512,0][0,1024,0][0,2048,0]";
+        const std::string esperado = "[1,512,10][0,512,0][0,1024,0] | [0,2048,0]";
         bool ok = colocado && memoria.imprimir() == esperado;
         ok = memoria.eventos().empty() && ok;
         revisar(ok, 1, esperado + " sin avisos", memoria.imprimir());
@@ -38,12 +38,12 @@ int main() {
         Proceso* p = new Proceso{2, 10, 3};
         const bool colocado = memoria.colocar(p);
         const std::string esperado =
-            "[2,32,3][0,32,0][0,64,0][0,128,0][0,256,0][0,512,0]";
+            "[2,32,3][0,32,0][0,64,0][0,128,0][0,256,0] | [0,512,0]";
         bool ok = colocado && memoria.imprimir() == esperado;
 
         p->cuanto = 1;
         const std::string conCuantoActualizado =
-            "[2,32,1][0,32,0][0,64,0][0,128,0][0,256,0][0,512,0]";
+            "[2,32,1][0,32,0][0,64,0][0,128,0][0,256,0] | [0,512,0]";
         ok = memoria.imprimir() == conCuantoActualizado && ok;
         revisar(ok, 2, conCuantoActualizado, memoria.imprimir());
         delete p;
@@ -58,7 +58,7 @@ int main() {
         const bool colocados = memoria.colocar(a) && memoria.colocar(b) &&
                                memoria.colocar(c) && memoria.colocar(d);
         const std::string esperado =
-            "[1,128,1][3,64,1][0,64,0][2,256,1][4,256,1][0,256,0]";
+            "[1,128,1][3,64,1][0,64,0][2,256,1] | [4,256,1][0,256,0]";
         revisar(colocados && memoria.imprimir() == esperado, 3, esperado,
                 memoria.imprimir());
         delete a;
@@ -76,7 +76,7 @@ int main() {
         for (Proceso* p : procesos) {
             colocados = memoria.colocar(p) && colocados;
         }
-        const std::string lleno = "[1,256,1][2,256,1][3,256,1][4,256,1]";
+        const std::string lleno = "[1,256,1][2,256,1] | [3,256,1][4,256,1]";
         bool ok = colocados && memoria.imprimir() == lleno;
 
         Proceso* grande = new Proceso{5, 600, 1};
@@ -101,7 +101,7 @@ int main() {
 
         memoria.descargar(1);
         memoria.descargar(2);
-        const std::string antes = "[0,128,0][0,128,0][0,256,0][0,512,0]";
+        const std::string antes = "[0,128,0][0,128,0][0,256,0] | [0,512,0]";
         ok = memoria.imprimir() == antes && ok;
         ok = memoria.condensar() && ok;
 

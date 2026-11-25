@@ -106,6 +106,9 @@ std::vector<std::string> Buddy::eventos() {
 std::string Buddy::imprimir() {
     std::ostringstream salida;
     for (const Bloque& bloque : bloques) {
+        if (bloque.inicio == memoriaKB / 2) {
+            salida << " | ";
+        }
         if (bloque.proceso == nullptr) {
             salida << "[0," << bloque.tamano << ",0]";
         } else {
